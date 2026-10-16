@@ -1,0 +1,137 @@
+<!DOCTYPE html><html lang="ms"><head><meta charset="utf-8"><title>Sejarah Runner</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#0f172a;font-family:system-ui,sans-serif;color:#fff;user-select:none}
+#c{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
+#hud{position:fixed;top:0;left:0;right:0;padding:calc(env(safe-area-inset-top,0px) + 8px) 10px 0;display:flex;justify-content:space-between;gap:6px;font-weight:700;font-size:15px;pointer-events:none;text-shadow:0 2px 4px #0008}
+#hud span{background:#0007;padding:5px 9px;border-radius:14px}
+#bb{display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + 50px);left:50%;transform:translateX(-50%);width:min(86vw,420px);text-align:center;font-weight:700;font-size:14px;text-shadow:0 2px 4px #000}
+#bb div{height:16px;background:#0008;border-radius:9px;overflow:hidden;margin-top:3px;border:2px solid #fff}
+#bf{height:100%;width:100%;background:linear-gradient(#ff5252,#b71c1c);transition:width .3s}
+#qp{position:fixed;left:0;right:0;bottom:0;padding:14px 12px calc(env(safe-area-inset-bottom,0px) + 12px);background:#0f172af0;border-radius:20px 20px 0 0;transform:translateY(105%);transition:transform .3s}
+#qp.show{transform:none}
+#qp>*{max-width:640px;margin-left:auto;margin-right:auto}
+#ql{font-size:12px;color:#fbbf24;font-weight:700;letter-spacing:.05em}
+#qt{font-size:17px;font-weight:700;margin:4px auto 10px;line-height:1.35}
+#op{display:grid;grid-template-columns:1fr;gap:8px}
+@media(min-width:640px){#op{grid-template-columns:1fr 1fr}}
+#op button{font:inherit;font-weight:600;font-size:15px;color:#fff;background:#1e3a8a;border:2px solid #3b82f6;border-radius:12px;padding:12px;text-align:left;cursor:pointer}
+#op button.ok{background:#15803d;border-color:#4ade80}
+#op button.bad{background:#b91c1c;border-color:#f87171}
+#ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#0f172acc;padding:20px}
+#ov .cd{background:#1e293b;border:2px solid #fbbf24;border-radius:20px;padding:22px;max-width:380px;text-align:center}
+#ov h1{margin:0 0 6px;font-size:28px;color:#fbbf24}
+#ov p{margin:6px 0;line-height:1.45;font-size:15px}
+.in{display:block;width:100%;font:inherit;font-size:16px;margin-top:8px;padding:11px;border-radius:12px;border:2px solid #475569;background:#0f172a;color:#fff;text-align:center}
+#go{font:inherit;font-weight:800;font-size:18px;margin-top:12px;padding:12px 32px;border:0;border-radius:14px;background:#fbbf24;color:#1e293b;cursor:pointer}
+#fl{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .4s}
+#mu{position:fixed;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);background:#0007;border:0;color:#fff;font-size:20px;border-radius:50%;width:40px;height:40px;z-index:5}
+</style></head><body>
+<canvas id="c"></canvas><div id="fl"></div>
+<div id="hud"><span id="sc">⭐ 0</span><span id="co">🪙 0</span><span id="lv"></span><span id="qn"></span></div>
+<div id="bb"><b id="bn"></b><div><div id="bf"></div></div></div>
+<div id="qp"><div id="ql"></div><div id="qt"></div><div id="op"></div></div>
+<div id="ov"><div class="cd"><h1 id="ot">🏃 SEJARAH RUNNER</h1><p id="od">Sejarah Tingkatan 2<br>Kesultanan Melayu Melaka</p><p id="oi" style="font-size:13px;color:#cbd5e1">Leret kiri/kanan = tukar lorong<br>Leret atas = lompat<br>Jawab kuiz untuk lepasi halangan &amp; tumbuk/tendang boss!</p><input class="in" id="nm" placeholder="Nama" maxlength="40" autocomplete="off"><input class="in" id="kl" placeholder="Kelas (cth: 2 Bestari)" maxlength="20" autocomplete="off"><button id="go">▶ MAIN</button></div></div>
+<button id="mu">🔊</button>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ====== SOALAN: tambah/tukar di sini. Format: {q:"soalan",o:["A","B","C","D"],a:indeksJawapanBetul(0-3)} ======
+const Q=[
+{q:"Siapakah pengasas Kesultanan Melayu Melaka?",o:["Parameswara","Sang Nila Utama","Raja Kecil","Sultan Mahmud"],a:0},
+{q:"Pada tahun bilakah Melaka dikalahkan oleh Portugis?",o:["1400","1511","1641","1786"],a:1},
+{q:"Siapakah Bendahara terkenal pada zaman kegemilangan Melaka?",o:["Tun Perak","Tun Teja","Hang Jebat","Tun Mamat"],a:0},
+{q:"Apakah agama rasmi Kesultanan Melayu Melaka?",o:["Hindu","Buddha","Islam","Kristian"],a:2},
+{q:"Siapakah Laksamana Melaka yang terkenal dengan kesetiaannya?",o:["Hang Kasturi","Hang Tuah","Hang Lekir","Hang Jebat"],a:1},
+{q:"Siapakah panglima Portugis yang menyerang Melaka pada tahun 1511?",o:["Vasco da Gama","Francisco Serrao","Afonso de Albuquerque","Ferdinand Magellan"],a:2},
+{q:"Apakah nama undang-undang bertulis yang digunakan di Melaka?",o:["Undang-undang Laut","Hukum Kanun Melaka","Perlembagaan Persekutuan","Undang-undang 99 Perak"],a:1},
+{q:"Melaka berkembang sebagai pelabuhan penting kerana terletak di tepi…",o:["Laut China Selatan","Selat Melaka","Selat Tebrau","Sungai Pahang"],a:1},
+{q:"Pelabuhan Melaka berfungsi sebagai pusat…",o:["Entrepot (perdagangan antarabangsa)","Perlombongan bijih","Pertanian padi","Pembuatan kereta"],a:0},
+{q:"Kuasa Eropah manakah menakluk Melaka pada tahun 1641?",o:["Inggeris","Sepanyol","Belanda","Perancis"],a:2}
+];
+const TOTAL=10,SP=14,LX=[-2.4,0,2.4],$=id=>document.getElementById(id);
+let st='start',speed=0,lane=1,score=0,coins=0,lives=3,qi=0,vy=0,py=0,tc=0,time=0,spawnT=0;
+let obs=null,boss=null,bhp=5,bossN=0,last=-1,atk=0,atkT=0,lunge=0,deadT=0,bhit=0,cur=null,order=[],lock=false,mute=false;
+const items=[];
+// ---- sound
+let ac;function snd(f,d=.15,ty='square',v=.07,f2){if(mute)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain(),n=ac.currentTime;o.type=ty;o.frequency.setValueAtTime(f,n);if(f2)o.frequency.exponentialRampToValueAtTime(f2,n+d);g.gain.setValueAtTime(v,n);g.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(n+d)}catch(e){}}
+const sOk=()=>{snd(523,.12);setTimeout(()=>snd(784,.2),110)},sBad=()=>snd(220,.35,'sawtooth',.1,70),sHit=()=>snd(160,.18,'square',.12,50),sCoin=()=>snd(988,.1,'square',.05,1400),sJump=()=>snd(350,.18,'sine',.09,800);
+// ---- three
+const R=new THREE.WebGLRenderer({canvas:$('c'),antialias:true});
+const sc=new THREE.Scene();sc.background=new THREE.Color(0x87d3ff);sc.fog=new THREE.Fog(0x87d3ff,35,120);
+const cam=new THREE.PerspectiveCamera(60,1,.1,200);
+function rs(){R.setPixelRatio(Math.min(devicePixelRatio,2));R.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.position.set(0,5.5,innerWidth<innerHeight?12:9);cam.lookAt(0,1.5,-6);cam.updateProjectionMatrix()}
+addEventListener('resize',rs);rs();
+sc.add(new THREE.HemisphereLight(0xffffff,0x557755,.9));
+const dl=new THREE.DirectionalLight(0xffffff,.8);dl.position.set(5,10,6);sc.add(dl);
+const bx=(w,h,d,c,x=0,y=0,z=0)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color:c}));m.position.set(x,y,z);return m};
+// road
+const cv=document.createElement('canvas');cv.width=cv.height=256;const g=cv.getContext('2d');
+g.fillStyle='#3a3f4b';g.fillRect(0,0,256,256);g.fillStyle='#fff';g.fillRect(83,40,5,90);g.fillRect(168,40,5,90);g.fillStyle='#fbbf24';g.fillRect(0,0,8,256);g.fillRect(248,0,8,256);
+const tex=new THREE.CanvasTexture(cv);tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(1,25);
+const road=new THREE.Mesh(new THREE.PlaneGeometry(7.2,200),new THREE.MeshLambertMaterial({map:tex}));road.rotation.x=-Math.PI/2;road.position.z=-80;sc.add(road);
+const grass=new THREE.Mesh(new THREE.PlaneGeometry(80,200),new THREE.MeshLambertMaterial({color:0x4caf50}));grass.rotation.x=-Math.PI/2;grass.position.set(0,-.05,-80);sc.add(grass);
+const bl=[];const pal=[0xf8bbd0,0xffe082,0xb3e5fc,0xc5e1a5,0xd1c4e9,0xffccbc];
+for(let i=0;i<8;i++)for(const s of[-1,1]){const h=6+Math.random()*10,b=bx(4+Math.random()*2,h,6,pal[(Math.random()*6)|0],s*(8+Math.random()*3),h/2,-i*14);bl.push(b);sc.add(b)}
+// player
+const P=new THREE.Group();sc.add(P);
+const piv=(x,y,w,h,c)=>{const p=new THREE.Group();p.position.set(x,y,0);p.add(bx(w,h,w,c,0,-h/2+.05,0));P.add(p);return p};
+P.add(bx(.9,1.1,.5,0xff5722,0,1.5,0),bx(.6,.6,.6,0xffcc99,0,2.35,0),bx(.7,.2,.7,0x1565c0,0,2.72,0));
+const aL=piv(-.6,2,.25,.95,0xffcc99),aR=piv(.6,2,.25,.95,0xffcc99),lL=piv(-.25,.95,.3,.95,0x1976d2),lR=piv(.25,.95,.3,.95,0x1976d2);
+// objects
+const cg=new THREE.CylinderGeometry(.4,.4,.1,16);cg.rotateX(Math.PI/2);const cm=new THREE.MeshLambertMaterial({color:0xffc107,emissive:0x664400});
+function spawnObs(){const o=new THREE.Group();o.add(bx(7.2,1.3,.6,0xe53935,0,.65),bx(7.2,.3,.62,0xffffff,0,.95),bx(.3,2,.3,0x9e9e9e,-3.4,1),bx(.3,2,.3,0x9e9e9e,3.4,1));o.position.z=-80;o.passed=false;obs=o;sc.add(o)}
+function spawnBoss(){const t=qi==4?0:1,c=[0x7b1fa2,0xb71c1c][t],b=new THREE.Group();
+b.add(bx(3,3.2,2,c,0,2.2,0),bx(2.2,1.6,1.8,c,0,4.6,0),bx(.5,.5,.2,0xffff00,-.6,4.8,.95),bx(.5,.5,.2,0xffff00,.6,4.8,.95),bx(1.4,.3,.2,0xffffff,0,4.1,.95),bx(.5,1,.5,0x424242,-.8,5.7,0),bx(.5,1,.5,0x424242,.8,5.7,0),bx(.9,2.4,.9,c,-2,2.4,0),bx(.9,2.4,.9,c,2,2.4,0),bx(1,1.6,1,0x333333,-.8,.8,0),bx(1,1.6,1,0x333333,.8,.8,0));
+b.userData={s:t?1.3:1,n:t?'👹 Monster Penjajah 2':'👾 Monster Penjajah 1'};b.scale.setScalar(b.userData.s);b.position.set(0,0,-55);boss=b;bossN=0;bhp=5;deadT=0;sc.add(b)}
+function nextEvent(){if(qi>=TOTAL)return end(true);(qi==4||qi==9)?spawnBoss():spawnObs()}
+// ---- quiz
+function ask(){let k=qi;if(st=='boss'&&bossN>0){do{k=(Math.random()*Q.length)|0}while(k==last&&Q.length>1)}last=k;bossN++;cur=Q[k];
+order=[0,1,2,3].sort(()=>Math.random()-.5);lock=false;
+$('ql').textContent=st=='boss'?'⚔️ SERANG BOSS! Jawab betul untuk menyerang':'🚧 HALANGAN – SOALAN '+(qi+1)+'/'+TOTAL;$('qt').textContent=cur.q;
+const op=$('op');op.innerHTML='';order.forEach((oi,bi)=>{const b=document.createElement('button');b.textContent=String.fromCharCode(65+bi)+'. '+cur.o[oi];b.onclick=()=>answer(bi,b);op.appendChild(b)});
+$('qp').classList.add('show')}
+function answer(bi,btn){if(lock)return;lock=true;const ok=order[bi]==cur.a;btn.classList.add(ok?'ok':'bad');
+if(!ok)[...$('op').children].forEach((b,i)=>{if(order[i]==cur.a)b.classList.add('ok')});
+ok?sOk():sBad();setTimeout(()=>resolve(ok),900)}
+function resolve(ok){$('qp').classList.remove('show');
+if(st=='quiz'){if(ok){score+=100;obs.passed=true;st='run';speed=SP;vy=13;sJump()}else{if(!hurt())return;sc.remove(obs);obs=null;qi++;st='run';speed=SP;nextEvent()}}
+else if(st=='boss'){if(ok){score+=150;atk=.001;atkT^=1;bhp--;setTimeout(()=>{sHit();bhit=.25;bar();flash('#fff')},250);setTimeout(()=>bhp<=0?(deadT=.001):ask(),850)}
+else{if(!hurt())return;lunge=.001;setTimeout(ask,850)}}
+hud()}
+function hurt(){lives--;flash('#f00');hud();if(lives<=0){end(false);return false}return true}
+function flash(c){const f=$('fl');f.style.background=c;f.style.opacity=.5;setTimeout(()=>f.style.opacity=0,150)}
+function bar(){$('bf').style.width=Math.max(0,bhp/5*100)+'%'}
+function hud(){$('sc').textContent='⭐ '+score;$('co').textContent='🪙 '+coins;$('lv').textContent='❤️'.repeat(Math.max(0,lives))+'🖤'.repeat(3-Math.max(0,lives));$('qn').textContent='Soalan '+Math.min(qi+1,TOTAL)+'/'+TOTAL}
+function end(w){st='over';speed=0;$('qp').classList.remove('show');$('bb').style.display='none';if(w)[0,1,2,3].forEach(i=>setTimeout(()=>snd(523+i*130,.2),i*150));else snd(200,.8,'sawtooth',.1,40);
+$('ot').textContent=w?'🏆 TAHNIAH!':'💀 TAMAT PERMAINAN';$('od').innerHTML='<b>'+esc(PL.n)+' – '+esc(PL.k)+'</b><br>'+(w?'Anda menewaskan semua boss!':'Cuba lagi, ulang kaji Sejarah!')+'<br>⭐ Markah: '+(score+coins*10)+' &nbsp; 🪙 Syiling: '+coins+'<br>'+(w?'⭐'.repeat(Math.max(1,lives)):'');$('oi').style.display='none';$('go').textContent='🔄 MAIN SEMULA';$('ov').style.display='flex'}
+function begin(){if(obs)sc.remove(obs);if(boss)sc.remove(boss);obs=boss=null;items.splice(0).forEach(m=>sc.remove(m));
+st='run';speed=SP;lane=1;score=coins=0;lives=3;qi=0;py=vy=0;atk=lunge=deadT=0;spawnT=.5;$('ov').style.display='none';$('bb').style.display='none';hud();nextEvent()}
+let PL={n:'',k:''};const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+$('go').onclick=()=>{const n=$('nm').value.trim(),k=$('kl').value.trim();if(!n||!k){(n?$('kl'):$('nm')).focus();flash('#f00');return}PL={n,k};snd(600,.1);begin()};$('mu').onclick=()=>{mute=!mute;$('mu').textContent=mute?'🔇':'🔊'};
+// ---- input
+const jump=()=>{if(py<.05){vy=10;sJump()}};
+addEventListener('keydown',e=>{if(st!='run')return;const k=e.key;if(k=='ArrowLeft'||k=='a')lane=Math.max(0,lane-1);else if(k=='ArrowRight'||k=='d')lane=Math.min(2,lane+1);else if(k=='ArrowUp'||k=='w'||k==' ')jump()});
+let sx=0,sy=0;$('c').addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY});
+$('c').addEventListener('pointerup',e=>{if(st!='run')return;const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dx)>30&&Math.abs(dx)>Math.abs(dy))lane=Math.max(0,Math.min(2,lane+(dx>0?1:-1)));else if(dy<-30)jump()});
+// ---- loop
+const clock=new THREE.Clock();
+function update(dt){time+=dt;tex.offset.y+=speed*dt/8;bl.forEach(b=>{b.position.z+=speed*dt;if(b.position.z>15)b.position.z-=112});
+P.position.x+=(LX[lane]-P.position.x)*Math.min(1,dt*12);vy-=26*dt;py+=vy*dt;if(py<0){py=0;vy=0}P.position.y=py;
+const run=speed>0,s=run?Math.sin(tc+=dt*16):0;lL.rotation.x=s*.9;lR.rotation.x=-s*.9;aL.rotation.x=-s*.9;aR.rotation.x=s*.9;
+if(atk>0){atk+=dt*2;const p=Math.min(atk,1),a=Math.sin(p*Math.PI);(atkT?lR:aR).rotation.x=(atkT?1.6:1.7)*a;P.position.z=-5*a;if(atk>=1){atk=0;P.position.z=0}}
+if(run&&st=='run'){spawnT-=dt;if(spawnT<0){spawnT=1.7;const l=(Math.random()*3)|0;for(let k=0;k<4;k++){const m=new THREE.Mesh(cg,cm);m.position.set(LX[l],1.2,-85-k*3.5);items.push(m);sc.add(m)}}}
+for(let i=items.length-1;i>=0;i--){const m=items[i];m.position.z+=speed*dt;m.rotation.y+=dt*4;
+if(Math.abs(m.position.z)<1.2&&Math.abs(m.position.x-P.position.x)<1.2&&py<2.5){coins++;sCoin();hud();sc.remove(m);items.splice(i,1)}else if(m.position.z>8){sc.remove(m);items.splice(i,1)}}
+if(obs){obs.position.z+=speed*dt;if(st=='run'&&!obs.passed&&obs.position.z>-9){speed=0;st='quiz';ask()}
+if(obs&&obs.passed&&obs.position.z>6){sc.remove(obs);obs=null;qi++;hud();nextEvent()}}
+if(boss){const u=boss.userData;
+if(st=='run'&&!deadT){boss.position.z+=speed*dt;if(boss.position.z>-8){boss.position.z=-8;speed=0;st='boss';$('bn').textContent=u.n;bar();$('bb').style.display='block';ask()}}
+if(st=='boss'){boss.position.y=Math.abs(Math.sin(time*3))*.25;if(lunge>0){lunge+=dt*2;const p=Math.min(lunge,1);boss.position.z=-8+3.5*Math.sin(p*Math.PI);if(lunge>=1){lunge=0;boss.position.z=-8}}}
+bhit=Math.max(0,bhit-dt);boss.traverse(o=>{if(o.material&&o.material.emissive)o.material.emissive.setHex(bhit>0?0xaa5555:0)});
+if(deadT>0){deadT+=dt;boss.rotation.z=deadT*1.4;boss.position.y=-deadT*2;boss.scale.setScalar(u.s*Math.max(.05,1-deadT*.7));
+if(deadT>1.2){sc.remove(boss);boss=null;deadT=0;$('bb').style.display='none';st='run';speed=SP;qi++;score+=300;hud();snd(880,.3,'square',.08,1760);nextEvent()}}}
+}
+function loop(){requestAnimationFrame(loop);update(Math.min(clock.getDelta(),.05));R.render(sc,cam)}
+hud();loop();
+</script></body></html>

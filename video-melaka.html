@@ -1,0 +1,78 @@
+<!DOCTYPE html><html lang="ms"><head><meta charset="utf-8"><title>Video Pengenalan – Kesultanan Melayu Melaka</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;overflow:hidden;background:#0f172a;color:#fff;font-family:system-ui,sans-serif;user-select:none}
+#st{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 16px) 20px 130px;text-align:center;transition:background 1s}
+.no{position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);left:14px;font-size:13px;font-weight:700;background:#0006;padding:4px 10px;border-radius:12px}
+.ic{font-size:clamp(60px,15vw,110px);animation:bob 2.4s ease-in-out infinite}
+h1{font-size:clamp(26px,6vw,46px);color:#fbbf24;margin:4px 0 12px;animation:in .8s ease both}
+ul{list-style:none;max-width:820px;width:100%}
+li{font-size:clamp(17px,4.4vw,28px);line-height:1.35;margin:.45em auto;padding:.35em .8em;background:#0004;border-radius:14px;width:fit-content;max-width:100%;opacity:0;animation:in .8s ease both}
+b{color:#fbbf24}
+@keyframes in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes bob{50%{transform:translateY(-12px)}}
+@keyframes sail{from{left:-60px}to{left:100%}}
+body.pa *{animation-play-state:paused!important}
+#sea{position:fixed;left:0;bottom:calc(env(safe-area-inset-bottom,0px) + 78px);font-size:34px;animation:sail 18s linear infinite;pointer-events:none}
+#wv{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 76px);height:4px;background:#38bdf8aa}
+#ct{position:fixed;left:0;right:0;bottom:0;padding:10px 14px calc(env(safe-area-inset-bottom,0px) + 8px);background:#0b1220ee}
+#tr{height:14px;background:#334155;border-radius:7px;cursor:pointer;overflow:hidden}
+#pb{height:100%;width:0;background:#fbbf24}
+#bt{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:6px}
+#bt button{font-size:22px;min-width:46px;height:44px;border:0;border-radius:12px;background:#1e293b;color:#fff;cursor:pointer}
+#tm{font-size:14px;min-width:90px;text-align:center}
+#ov{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:20px;background:#0f172af0}
+#ov h2{font-size:clamp(24px,6vw,40px);color:#fbbf24}
+#ov p{color:#cbd5e1}
+#big{font-size:28px;font-weight:800;padding:14px 38px;border:0;border-radius:16px;background:#fbbf24;color:#1e293b;cursor:pointer;margin-top:8px}
+</style></head><body class="pa">
+<div id="st"></div><div id="wv"></div><div id="sea">⛵</div>
+<div id="ct"><div id="tr"><div id="pb"></div></div><div id="bt"><button id="pv">⏮</button><button id="pp">▶</button><button id="nx">⏭</button><span id="tm">0:00 / 5:00</span><button id="mu">🎵</button><button id="fs">⛶</button></div></div>
+<div id="ov"><div style="font-size:70px">🏰</div><h2 id="oh">Kesultanan Melayu Melaka</h2><p id="op">Video ulang kaji • Sejarah Tingkatan 2 • kira-kira 5 minit</p><button id="big">▶ MULA</button></div>
+<script>
+const S=[
+{d:20,bg:'#1e3a8a,#0f172a',i:'🏰',t:'Kesultanan Melayu Melaka',l:['Selamat datang, murid-murid! 👋','Sebelum bermain kuiz, mari ulang kaji <b>Kesultanan Melayu Melaka</b>.','Beri perhatian kepada <b>nama, tahun dan tempat</b> penting.','Maklumat ini membantu anda menjawab soalan dan menewaskan boss!']},
+{d:30,bg:'#7c2d12,#1c1917',i:'👑',t:'Siapa Pengasas Melaka?',l:['Melaka diasaskan oleh <b>Parameswara</b>.','Baginda berpindah dari Temasik dan tiba di Melaka sekitar <b>tahun 1400</b>.','Pada asalnya, Melaka hanyalah sebuah perkampungan nelayan.','Kedudukan yang baik membuatnya cepat berkembang menjadi kerajaan besar.','Ingat: Pengasas = <b>Parameswara</b>']},
+{d:30,bg:'#075985,#0f172a',i:'🌊',t:'Lokasi Strategik',l:['Melaka terletak di tepi <b>Selat Melaka</b>.','Selat ini ialah laluan utama kapal dagang antara India, Asia Barat dan China.','Pedagang singgah sambil menunggu <b>angin monsun</b> bertukar arah.','Pelabuhan Melaka terlindung daripada ribut.','Ingat: Melaka berkembang di tepi <b>Selat Melaka</b>']},
+{d:35,bg:'#065f46,#0f172a',i:'⚓',t:'Pelabuhan Entrepot',l:['Melaka menjadi pusat perdagangan antarabangsa atau <b>pelabuhan entrepot</b>.','Entrepot ialah pelabuhan tempat barang dari pelbagai negara dikumpul dan dijual semula.','Pedagang datang dari Arab, India, China, Jawa dan banyak lagi.','Barang dagangan termasuk rempah, sutera, tekstil dan bijih timah.','<b>Syahbandar</b> mengurus pelabuhan dan pedagang asing.']},
+{d:40,bg:'#581c87,#0f172a',i:'🧑‍⚖️',t:'Pentadbiran & Tokoh Penting',l:['Pemerintah tertinggi ialah <b>Sultan</b>, dibantu oleh para pembesar.','<b>Bendahara</b> ialah ketua pembesar. Tokoh terkenal ialah <b>Tun Perak</b>.','Tun Perak bijak mentadbir dan mengatur strategi pertahanan Melaka.','<b>Laksamana</b> mengetuai angkatan laut. Tokoh terkenal ialah <b>Hang Tuah</b>.','Hang Tuah terkenal kerana <b>taat setia</b> kepada sultan.']},
+{d:25,bg:'#14532d,#0f172a',i:'🕌',t:'Agama Islam',l:['Islam diterima oleh pemerintah dan menjadi <b>agama rasmi</b> Melaka.','Pedagang Islam dari Arab dan India turut membantu penyebarannya.','Melaka menjadi pusat penyebaran Islam di Asia Tenggara.','Ingat: Agama rasmi = <b>Islam</b>']},
+{d:30,bg:'#854d0e,#1c1917',i:'📜',t:'Undang-Undang Melaka',l:['Melaka mempunyai undang-undang bertulis bernama <b>Hukum Kanun Melaka</b>.','Ia mengandungi peraturan tentang pentadbiran, jenayah dan keluarga.','Terdapat juga <b>Undang-Undang Laut Melaka</b> untuk pelayaran dan perdagangan.','Undang-undang yang teratur menjadikan Melaka aman dan selamat untuk berdagang.','Ingat: Undang-undang bertulis = <b>Hukum Kanun Melaka</b>']},
+{d:40,bg:'#7f1d1d,#0f172a',i:'⚔️',t:'Kejatuhan Melaka 1511',l:['Pada tahun <b>1511</b>, Melaka diserang oleh <b>Portugis</b>.','Panglima Portugis ialah <b>Afonso de Albuquerque</b>.','Portugis mahu menguasai perdagangan rempah di Timur.','Selepas menang, Portugis membina kubu <b>A Famosa</b>.','Sultan Mahmud Syah berundur dan meneruskan penentangan dari tempat lain.','Ingat: <b>1511</b> = Melaka jatuh ke tangan Portugis']},
+{d:25,bg:'#9a3412,#0f172a',i:'🚢',t:'Belanda Menakluk Melaka',l:['Pada tahun <b>1641</b>, Melaka jatuh ke tangan <b>Belanda</b>.','Belanda menewaskan Portugis dengan bantuan Johor.','Ingat: <b>1641</b> = Belanda']},
+{d:25,bg:'#1e3a8a,#0f172a',i:'🏁',t:'Garis Masa & Ringkasan',l:['<b>c. 1400</b> – Parameswara mengasaskan Melaka','<b>1511</b> – Portugis menawan Melaka','<b>1641</b> – Belanda menawan Melaka','Anda sudah bersedia! Mari bermain <b>Sejarah Runner</b> 🏃']}
+];
+const $=id=>document.getElementById(id),TOT=S.reduce((a,s)=>a+s.d,0),starts=[];let a=0;S.forEach(s=>{starts.push(a);a+=s.d});
+let T=0,idx=-1,play=false,last=0,fin=false;
+function show(i,lt){idx=i;const s=S[i],n=s.l.length,gap=Math.min(7,(s.d-4)/n);
+$('st').style.background='linear-gradient(160deg,'+s.bg+')';
+$('st').innerHTML='<div class="no">Bahagian '+(i+1)+'/'+S.length+'</div><div class="ic">'+s.i+'</div><h1>'+s.t+'</h1><ul>'+s.l.map((x,k)=>'<li style="animation-delay:'+(1.2+k*gap-lt).toFixed(2)+'s">'+x+'</li>').join('')+'</ul>'}
+const fmt=t=>Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');
+function sceneAt(t){let i=0;while(i<S.length-1&&t>=starts[i+1])i++;return i}
+function seek(t){T=Math.max(0,Math.min(TOT-.01,t));fin=false;const i=sceneAt(T);show(i,T-starts[i])}
+function setPlay(p){play=p;document.body.classList.toggle('pa',!p);$('pp').textContent=p?'⏸':'▶';music(p)}
+function tick(ts){const dt=Math.min((ts-last)/1000,.2);last=ts;
+if(play){T+=dt;if(T>=TOT){T=TOT;setPlay(false);fin=true;$('oh').textContent='🎉 Tamat!';$('op').textContent='Selamat bermain Sejarah Runner!';$('big').textContent='↺ ULANG';$('ov').style.display='flex'}
+else{const i=sceneAt(T);if(i!=idx){show(i,T-starts[i]);gong()}}}
+$('pb').style.width=(T/TOT*100)+'%';$('tm').textContent=fmt(T)+' / '+fmt(TOT);requestAnimationFrame(tick)}
+$('big').onclick=()=>{$('ov').style.display='none';if(fin||T>=TOT)seek(0);setPlay(true);gong()};
+$('pp').onclick=()=>{if(fin){seek(0)}setPlay(!play)};
+$('pv').onclick=()=>{const i=sceneAt(T);seek(T-starts[i]>3?starts[i]:starts[Math.max(0,i-1)])};
+$('nx').onclick=()=>{const i=sceneAt(T);if(i<S.length-1)seek(starts[i+1])};
+$('tr').addEventListener('pointerdown',e=>{const r=$('tr').getBoundingClientRect();seek((e.clientX-r.left)/r.width*TOT)});
+$('fs').onclick=()=>{const d=document.documentElement;document.fullscreenElement?document.exitFullscreen():d.requestFullscreen&&d.requestFullscreen()};
+// ---- muzik latar (dijana secara sintetik: gamelan/gendang gaya Melayu klasik)
+let ac,mg,mt=null,nt=0,bi=0,mi=3,mOn=true;const SC=[293.7,329.6,370,440,493.9,587.3,740];
+function env(f,t,d,ty,v,f2){const o=ac.createOscillator(),g=ac.createGain();o.type=ty;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(mg);o.start(t);o.stop(t+d+.05)}
+function bell(f,t){env(f,t,2,'triangle',.07);env(f*2.76,t,.9,'sine',.025)}
+function gong(){if(!ac||!play)return;const t=ac.currentTime+.05;env(73,t,4,'sine',.22);env(146,t,3,'sine',.08);env(219,t,2,'triangle',.04)}
+function sched(){while(nt<ac.currentTime+.4){const b=bi%8;
+if(b%2==0)env(130,nt,.35,'sine',.18,45);else env(420,nt,.06,'triangle',.05);
+if(b%2==0||Math.random()<.3){mi=Math.max(0,Math.min(SC.length-1,mi+((Math.random()*3)|0)-1));bell(SC[mi],nt+(b%2?.4:0))}
+if(b==0){env(146.8,nt,6.4,'sine',.05);env(220,nt,6.4,'sine',.03)}
+nt+=.8;bi++}}
+function music(p){if(p){try{if(!ac){ac=new(window.AudioContext||window.webkitAudioContext)();mg=ac.createGain();mg.gain.value=mOn?1:0;mg.connect(ac.destination);const d=ac.createDelay(),f=ac.createGain();d.delayTime.value=.45;f.gain.value=.35;mg.connect(d);d.connect(f);f.connect(d);d.connect(ac.destination);nt=ac.currentTime+.1}ac.resume();if(!mt)mt=setInterval(sched,150)}catch(e){}}else if(ac)ac.suspend()}
+$('mu').onclick=()=>{mOn=!mOn;$('mu').textContent=mOn?'🎵':'🔇';if(mg)mg.gain.value=mOn?1:0};
+show(0,0);requestAnimationFrame(t=>{last=t;tick(t)});
+</script></body></html>
